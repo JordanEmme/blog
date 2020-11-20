@@ -1,2 +1,2 @@
-# JordanEmme.github.io
+# Blog
 My personal webpage
