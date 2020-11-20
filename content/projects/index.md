@@ -11,7 +11,7 @@ draft: false
 
 {{<figure src="covid.png">}}
 
-|[<i class='fas fa-laptop-code'></i> Webapp](https://covid-hospital-france.herokuapp.com)|[<i class='fas fa-table'></i>  Data](https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/)|[<i class='fab fa-github'></i> Code](https://github.com/JordanEmme/covid-hospital-france)|
+|[<i class='fas fa-laptop-code'></i> Webapp](http://covid.jordanemme.com)|[<i class='fas fa-table'></i>  Data](https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/)|[<i class='fab fa-github'></i> Code](https://github.com/JordanEmme/covid-hospital-france)|
 |-|-|-|
 
 
