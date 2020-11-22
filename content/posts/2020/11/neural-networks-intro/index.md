@@ -58,7 +58,7 @@ The fundamental assumption for statistical learning is the following. We assume 
 $$
 y = f(X) + \varepsilon.
 $$
-The function $f$ is the *systemic* information that $X$ carries about $y$ and $\varepsilon$ is a random *error term*, which is centered and independent from the input variable $X$. 
+The function $f$ is the *systemic* information that $X$ carries about $y$ and $\varepsilon$ is a random *error term*, which is centred and independent from the input variable $X$. 
 
 In the case of *supervised learning*, we have both a data set $\mathbf{X}$ and its observation vector $\mathbf{y}$, and we use both these informations to *learn* (i.e. compute) an estimate $\hat{f}$ of $f$. If this estimate is a good approximation of $f$, it should then allows to make prediction on new data points by inputting them in our function $\hat f$. We usually denote predictions $\hat y$.
 
@@ -258,7 +258,7 @@ Let us now dive in the main subject. If you have read any kind of explanation fo
 
 {{<image src="neuron.png" caption="Source: [Neuron Vectors by Vecteezy](https://www.vecteezy.com/free-vector/neuron)" title="A neuron diagram">}}
 
-It is usually presented as an illustration for how artificial neurons work. The idea is to say something along the lines of *"the dendrites carry information to the nucleus where computations happen and the result is then transfered to the axon, and artificial neurons, or perceptrons, model that process by getting inputs from multiple sources and make a computation and output it"*. Well, for anyone with a bit of maths knowledge, having an object that takes several inputs and produces an output is something called a function of several variables...  As for understanding what truly happens inside a real neuron nucleus and how it all works on a bigger scale, well, let's just say we are not quite there yet...
+It is usually presented as an illustration for how artificial neurons work. The idea is to say something along the lines of *"the dendrites carry information to the nucleus where computations happen and the result is then transferred to the axon, and artificial neurons, or perceptrons, model that process by getting inputs from multiple sources and make a computation and output it"*. Well, for anyone with a bit of maths knowledge, having an object that takes several inputs and produces an output is something called a function of several variables...  As for understanding what truly happens inside a real neuron nucleus and how it all works on a bigger scale, well, let's just say we are not quite there yet...
 
 So, after taking these claims for what they are, i.e. analogies at best, and ending my rant in favour of writing something more productive, we can say what artificial neurons/perceptrons are: a subclass of functions of several variables. Let us make this subclass explicit.
 

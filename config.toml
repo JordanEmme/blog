@@ -139,6 +139,7 @@ theme = "LoveIt"
    [params.social]
     github = "JordanEmme"
     email= "jordanemme@protonmail.com"
+    linkedin= "jordan-emme-77b67a200"
     RSS = true
 
   [params.page.math]
