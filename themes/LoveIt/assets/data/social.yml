@@ -30,13 +30,21 @@ instagram:
   Icon:
     Class: fab fa-instagram fa-fw
 
-# 005: facebook
-facebook:
+# 005: hackerrank
+hackerrank:
   Weight: 5
-  Prefix: https://facebook.com/
-  Title: facebook
+  Prefix: https://hackerrank.com/
+  Title: HackerRank
   Icon:
-    Class: fab fa-facebook fa-fw
+    Class: fab fa-hackerrank fa-fw
+
+# 005: facebook
+#facebook:
+#  Weight: 5
+#  Prefix: https://facebook.com/
+#  Title: facebook
+#  Icon:
+#    Class: fab fa-facebook fa-fw
 
 # 006: Telegram
 telegram:
