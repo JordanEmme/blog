@@ -4,11 +4,14 @@ description = "My personal Data Science blog and portfolio"
 tags = [
   "blog",
   "portfolio",
+  "mathematics",
   "maths",
   "AI",
   "machine learning",
+  "deep learning",
   "data science",
-  "machine learning"
+  "machine learning",
+  "python"
 ]
 
 # [en, zh-cn, fr, ...] determines default content language
@@ -91,7 +94,7 @@ theme = "LoveIt"
     # special amount of posts in each section page
     paginate = 20
     # date format (month and day)
-    dateFormat = "01-02"
+    dateFormat = "2 Jan."
     # amount of RSS pages
     rss = 10
 
@@ -138,6 +141,7 @@ theme = "LoveIt"
 
    [params.social]
     github = "JordanEmme"
+    hackerrank = "jordanemme"
     email= "jordanemme@protonmail.com"
     linkedin= "jordanemme"
     RSS = true
@@ -152,6 +156,12 @@ theme = "LoveIt"
       inlineRightDelimiter = ""
       # KaTeX extension copy_tex
       copyTex = true
+
+  [params.page.code]
+    # whether to show the copy button of the code block
+    copy = false
+    # the maximum number of lines of displayed code by default
+    maxShownLines = 50
     
 
   [params.page.share]

@@ -5,13 +5,12 @@ date: 2020-11-16T17:19:31Z
 draft: false
 
 description: "A quick maths introduction to Deep Neural Networks"
-summary: "In this post I give a basic introduction of the main idea behind Artificial Neurons and Deep Neural Networks. In particular, I explain the classical techniques of linear and logistic regression, as well as the gradient descent algorithm"
+summary: "In this post I give a basic introduction of the main idea behind Artificial Neurons and Deep Neural Networks. In particular, I explain the classical techniques of linear and logistic regression, as well as the gradient descent algorithm."
 
 tags: ["Maths", "Neural Networks", 'Deep Learning']
 categories: ["Maths", "Deep Learning"]
 
 featuredImage: ""
-
 
 lightgallery: false
 ---
