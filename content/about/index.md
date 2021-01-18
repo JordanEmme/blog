@@ -9,7 +9,7 @@ draft: false
 
 Hi, I'm Jordan, welcome to my personal blog.
 
-I am a maths Ph.D. with an active interest in deep learning and data visualisation. After using Python for my own research for a number of years, I decided to study the tools and techniques dedicated to data science. I hope this website will become a testament to my growth in this area.
+I am a maths Ph.D. with an active interest in diverse applications of Pythonm including deep learning and data visualisation. After using Python for my own research for a number of years, I decided to study the tools and techniques dedicated to data science. I hope this website will become a testament to my growth in this area.
 
 
 # What is this blog?
