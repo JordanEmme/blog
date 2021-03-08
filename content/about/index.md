@@ -5,20 +5,22 @@ draft: false
 ---
 
 
-# Who I am
+# Who I am?
 
-Hi, I'm Jordan, welcome to my personal blog.
+Hi, I am Jordan. I am a maths PhD with an active interest in computer science and new technologies. When I was still doing maths research, I would often use Python or [SageMath](https://www.sagemath.org/) to help me gain insights on the problems I was working on.
 
-I am a maths Ph.D. with an active interest in diverse applications of Pythonm including deep learning and data visualisation. After using Python for my own research for a number of years, I decided to study the tools and techniques dedicated to data science. I hope this website will become a testament to my growth in this area.
+Having fond memories of trying to code efficiently to simulate dynamical systems on an overheating laptop, and even though not I am doing research anymore, I still very much enjoy learning about algos and their mathematical or real world applications.
 
 
 # What is this blog?
 
+This blog will contain all things related to maths, computer science, AI or Python that I find fun. Hopefully, in time, it will serve both as notes for future me and as a testament to my growth in these areas.
 
-Here, you will find and collection of my personal projects, as well as blog posts, mostly about:
-* Data analysis on subjects I'm passionate about (for everyone)
-* Tutorials (by a beginner, for beginners)
-* Notes about my projects and issues encountered (for everyone, and future me)
-* Notes/ramblings about the mathematics behind current data science techniques (for the curious mathematician).
+Eventually, I intend this to be full of posts about:
 
-I hope you enjoy your time spent here. Please don't hesitate to [contact me](mailto:jordanemme@protonmail.com) for any enquiries or comments.
+* the underlying maths of modern technologies (mostly for people with a maths background);
+* fun or pretty maths visuals;
+* more or less concrete projects, cause Jupyter Notebooks are cool, but webapps are cooler;
+* examples of algorithms that may be useful if you are into things like [Project Euler](https://projecteuler.net/).
+
+I hope you enjoy your time spent here. Please don't hesitate to [contact me](mailto:jordanemme@protonmail.com) for any enquiries or comments.su
