@@ -1,6 +1,6 @@
 +++
 title =  ""
-date = 2022-08-25T21:30:04+08:00
+date = 2024-10-24
 draft = false
 +++
-A blog of maths and computer science ramblings.
+Ramblings of a sleep-deprived programmer
