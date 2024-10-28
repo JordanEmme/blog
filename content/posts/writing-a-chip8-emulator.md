@@ -200,6 +200,8 @@ int main(int arc, char** argv){
   setup_window(); // where we initialise SDL, or whatever we use
   load_font();
   load_rom();
+
+  return 0;
 }  
 ```
 
@@ -207,22 +209,83 @@ int main(int arc, char** argv){
 
 This is where the magic actually happens, and what the meat of the program
 actually does. In order for each instruction of the program to be executed,
-three things need to happen. First, we need to grab the instruction at the
-address given by the opcode. This is the *fetch* step.
+three things need to happen. First, we need to grab the instruction's opcode at
+the address given by the program counter `pc`. This is the *fetch* step.
 
-Them, we get a 2-byte instruction, which can be represented by a number of
+Then, we get a 2-byte opcode, which can be represented by a number of
 length 4 in hexadecimal. We need to *decode* what instruction it matches to
 (more words on that later).
 
-Finally, we can *execute* that operation, *i.e.* actually change the states of the CHIP-8 accordingly.
+Finally, we can *execute* that operation, *i.e.* actually change the states of
+the CHIP-8 accordingly.
+
 
 Let us dive into more details on how to make this happen.
 
 #### Fetch
 
+This is the easy part. We just need to grab the two consecutive bytes in memory
+at the address given by the program counter, since an opcode is a 16-bit number
+(or, a 2-bytes number).
 
+The CHIP-8 is a big-endian system, so the byte stored at address `pc` is
+the most-significant one, and the one stored at address `pc + 1` is the
+least-significant one. The `fetch` function should therefore look something
+like this:
+
+```cpp
+uint16_t fetch(){
+  uint16_t opcode = (memory[pc] << 8) | memory[pc + 1];
+  pc += 2; // we increment the program counter
+  return opcode;
+}
+```
 
 #### Decode and Execute
+
+We have now gotten hold of the opcode, it is time to decode it. A complete
+list of supported operations and their code can be found [here](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#3.1).
+Nevertheless, let us say a few words about the general structure of the opcode.
+
+Chip-8 opcodes come in, roughly speaking, three flavours. Writing the 16-bit
+opcode as four hex digits, it can take one of three forms:
+
+1. 0xHxyn
+1. 0xHxkk
+1. 0xHnnn
+
+where
+* H is an hexadecimal digit which partially encodes the type of operation to
+be done;
+* n is a 4-bits nibble, either specifying the operation further, or used as an
+operation argument;
+* kk is a byte, often used as an operation argument;
+* nnn is a 12-bits nibble, which always encodes for a memory address;
+* x is a 4-bits integer, always specifying the register to be accessed for the
+operation;
+* y is a 4-bits integer, always specifying the register to be accessed for the
+operation.
+
+At this stage, our `main` function should now look something like this:
+
+```cpp
+int main(int argc, char** argv){
+  setup_window(); // where we initialise SDL, or whatever we use
+  load_font();
+  load_rom();
+
+  bool running = true;
+  uint16_t opcode;
+  while(running){
+    opcode = fetch();
+    decode_and_execute(opcode);
+    running = check_if_quit();
+  }
+  close_window();
+
+  return 0;
+}
+```
 
 ### The Display
 
