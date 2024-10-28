@@ -16,7 +16,7 @@ model.
 I have spent a lot more time than I would care to admit playing old SNES
 (amongst others) games when I was young and carefree. Being able to experience
 Secret of Mana and the likes on a computer always seemed like magic to me, but
-it had never occured to me then that I could just learn the trick behind the
+it had never occurred to me then that I could just learn the trick behind the
 illusion. So a few weeks ago, I decided to start learning doing just that, by
 writing my own CHIP-8 emulator.
 
@@ -170,7 +170,7 @@ conservative about memory. We chose not to, for the same reason as in 1.
 > 3. Similar remark for the keypad which could just be a single 16 bit integer
 where each bit represents whether a key is up or down. In my case, I didn't
 use either of these, and let SDL2 do the job of updating my keyboard states and
-grabed a handle to that data.
+grabbed a handle to that data.
 
 That is pretty much the data we need to play with in order to get this thing off
 the ground.
@@ -181,14 +181,14 @@ Before we start the actual emulation cycle, we should initialise some things. On
 top of setting up a window to render in, and something to play sound, the CHIP-8
 requires some data to be loaded in RAM.
 
-As mentionned in the [Specifications Overview](#specifications-overview), the
+As mentioned in the [Specifications Overview](#specifications-overview), the
 CHIP-8 requires a font to be loaded in memory. Any location between `0x000` and
 `0x1FF` is fair game, as this part of the RAM is dedicated to the interpreter/
 emulator we are building. Should we want to have the stack emulated as part of
 the RAM, this is also where we would put it. I, somewhat arbitrarily, decided to
 copy the font data at the start of the RAM, at address `0x000`.
 
-Furthemore, since we obviously want to test our emulator on some real CHIP-8
+Furthermore, since we obviously want to test our emulator on some real CHIP-8
 programs, we have to also load it in memory. The specifications I found
 regarding the CHIP-8 RAM layout indicated that a ROM should typically be loaded
 after memory address `0x200`.
@@ -250,21 +250,23 @@ Nevertheless, let us say a few words about the general structure of the opcode.
 Chip-8 opcodes come in, roughly speaking, three flavours. Writing the 16-bit
 opcode as four hex digits, it can take one of three forms:
 
-1. 0xHxyn
-1. 0xHxkk
-1. 0xHnnn
+1. `0xHxyn`
+1. `0xHxkk`
+1. `0xHnnn`
 
 where
-* H is an hexadecimal digit which partially encodes the type of operation to
+* `H` is an hexadecimal digit which partially encodes the type of operation to
 be done;
-* n is a 4-bits nibble, either specifying the operation further, or used as an
+* `n` is a 4-bits nibble, either specifying the operation further, or used as an
 operation argument;
-* kk is a byte, often used as an operation argument;
-* nnn is a 12-bits nibble, which always encodes for a memory address;
-* x is a 4-bits integer, always specifying the register to be accessed for the
+* `kk `is a byte, often used as an operation argument;
+* `nnn` is a 12-bits nibble, which always encodes for a memory address;
+* `x` is a 4-bits integer, always specifying the register to be accessed for the
 operation;
-* y is a 4-bits integer, always specifying the register to be accessed for the
+* `y` is a 4-bits integer, always specifying the register to be accessed for the
 operation.
+
+Given the overall simplicity of most of the operations, I have decided to wrap both the decoding and executing phases in a single function, which is basically a big switch case on values of `H`, 
 
 At this stage, our `main` function should now look something like this:
 
