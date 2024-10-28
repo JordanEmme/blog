@@ -56,7 +56,8 @@ The CHIP-8 consists of:
 * A hexadecimal keypad;
 * An 8-bits delay timer;
 * An 8-bits sound timer;
-* A 60Hz, 64x32, monochrome display.
+* A 60Hz, 64x32, monochrome display;
+* A 16 digits keypad;
 
 That is all the "hardware" that we have to emulate. This can be done in a very
 straightforward many, as this post will, hopefully, illustrate.
@@ -100,6 +101,25 @@ It should be clear from that example that, with digit 1 representing an
 "on" pixel, and 0 an "off" pixel, 5 bytes represent an 8x5 pixel sprite on a
 monochrome display.
 
+#### A Few Words on the Keypad
+
+The CHIP-8 keypad is made up of 16 digits (hex numbers between 0 and F), with the layout usually being like so:
+
+|  1  |  2  |  3  |  C  |  
+|:---:|:---:|:---:|:---:|
+|**4**|**5**|**6**|**D**|
+|**7**|**8**|**9**|**E**|
+|**A**|**0**|**B**|**F**|
+
+It's our choice entirely how we want to assign each key, but the usual choice seems to be to use the left portion of the (QWERTY) keyboard and have that keypad map to:
+
+|  1  |  2  |  3  |  4  |  
+|:---:|:---:|:---:|:---:|
+|**Q**|**W**|**E**|**R**|
+|**A**|**S**|**D**|**F**|
+|**Z**|**X**|**C**|**V**|
+
+
 ## How to Emulate
 
 Let's get into the nitty-gritty and look at what we need to do to actually
@@ -121,7 +141,9 @@ kids, self-harm is never the answer.
 
 ### Data Needed
 
-We need to represent all the hardware specs detailed in the [Specifications Overview](#specifications-overview) section with some data. So, we should see these different variables somewhere in our code:
+We need to represent all the hardware specs detailed in the [Specifications
+Overview](#specifications-overview) section with some data. So, we should see
+these different variables somewhere in our code:
 
 ```cpp
   uint8_t memory[4096];
@@ -143,7 +165,7 @@ to remain more faithful to how the CHIP-8 is supposed to work, should) put the
 stack somewhere in memory instead, as there is enough dedicated space in it for
 such purposes. We chose not to, out of laziness.
 > 2. Instead of using a 64x32 array of bools to store the display state, we
-could use an array of 64 bits (unsigned) integers of size 32, if we were more
+could use an array 32-bits (unsigned) integers of size 64, if we were more
 conservative about memory. We chose not to, for the same reason as in 1.
 > 3. Similar remark for the keypad which could just be a single 16 bit integer
 where each bit represents whether a key is up or down. In my case, I didn't
@@ -153,9 +175,54 @@ grabed a handle to that data.
 That is pretty much the data we need to play with in order to get this thing off
 the ground.
 
+### Loading Font and ROM Data
+
+Before we start the actual emulation cycle, we should initialise some things. On
+top of setting up a window to render in, and something to play sound, the CHIP-8
+requires some data to be loaded in RAM.
+
+As mentionned in the [Specifications Overview](#specifications-overview), the
+CHIP-8 requires a font to be loaded in memory. Any location between `0x000` and
+`0x1FF` is fair game, as this part of the RAM is dedicated to the interpreter/
+emulator we are building. Should we want to have the stack emulated as part of
+the RAM, this is also where we would put it. I, somewhat arbitrarily, decided to
+copy the font data at the start of the RAM, at address `0x000`.
+
+Furthemore, since we obviously want to test our emulator on some real CHIP-8
+programs, we have to also load it in memory. The specifications I found
+regarding the CHIP-8 RAM layout indicated that a ROM should typically be loaded
+after memory address `0x200`.
+
+At this stage, our `main` function looks something like:
+
+```cpp
+int main(int arc, char** argv){
+  setup_window(); // where we initialise SDL, or whatever we use
+  load_font();
+  load_rom();
+}  
+```
+
 ### Fetch-Decode-Execute Cycle
 
-OK, so now we've got all the hardware sorted but what do we actually do with it?
+This is where the magic actually happens, and what the meat of the program
+actually does. In order for each instruction of the program to be executed,
+three things need to happen. First, we need to grab the instruction at the
+address given by the opcode. This is the *fetch* step.
+
+Them, we get a 2-byte instruction, which can be represented by a number of
+length 4 in hexadecimal. We need to *decode* what instruction it matches to
+(more words on that later).
+
+Finally, we can *execute* that operation, *i.e.* actually change the states of the CHIP-8 accordingly.
+
+Let us dive into more details on how to make this happen.
+
+#### Fetch
+
+
+
+#### Decode and Execute
 
 ### The Display
 
@@ -163,8 +230,8 @@ OK, so now we've got all the hardware sorted but what do we actually do with it?
 
 ### Clock Speed
 
-## Further Improvements
+## Some Pitfalls
 
-## Testing
+## Further Improvements
 
 ## References
