@@ -4,6 +4,7 @@ date = '2024-10-24T15:34:57+02:00'
 draft = true
 toc = true
 tocBorder = true
+math = true
 [params]
   author = "Jordan Emme"
 +++
@@ -23,8 +24,8 @@ writing my own CHIP-8 emulator.
 I have had tons of fun doing it, and hope I can convey that excitement in
 this post. Additionally, if you are also interested in learning how to write
 emulators, this is a very manageable project to scratch that itch. Should you
-want to tackle it, I hope you find pretty much all the info you need here, even
-though this is not written as a tutorial.
+want to tackle it, I hope you find pretty much all the info and references you
+need here to get you most or all of the way there.
 
 ## The CHIP-8
 
@@ -44,7 +45,8 @@ machine.
 We give a few words on the CHIP-8 specs, but will dive into more details in the
 next section.
 
-#### "Hardware"
+---
+{data-content = "\"Hardware\""}
 
 The CHIP-8 consists of:
 * A CPU that typically runs at 700Hz (although implementations may vary);
@@ -62,7 +64,8 @@ The CHIP-8 consists of:
 That is all the "hardware" that we have to emulate. This can be done in a very
 straightforward many, as this post will, hopefully, illustrate.
 
-#### Font
+---
+{data-content = "Font"}
 
 On top of that hardware, the CHIP-8 should have a font loaded in memory. Here is
 a basic font that most people seem to be using:
@@ -101,7 +104,8 @@ It should be clear from that example that, with digit 1 representing an
 "on" pixel, and 0 an "off" pixel, 5 bytes represent an 8x5 pixel sprite on a
 monochrome display.
 
-#### A Few Words on the Keypad
+---
+{data-content = "Keypad"}
 
 The CHIP-8 keypad is made up of 16 digits (hex numbers between 0 and F), with the layout usually being like so:
 
@@ -119,13 +123,15 @@ It's our choice entirely how we want to assign each key, but the usual choice se
 |**A**|**S**|**D**|**F**|
 |**Z**|**X**|**C**|**V**|
 
+Note that depending on your implementation, you may need mappings in both
+directions.
 
 ## How to Emulate
 
 Let's get into the nitty-gritty and look at what we need to do to actually
 emulate the CHIP-8.
 
-### Prerequisite
+### Prerequisites
 
 Although we are technically writing a CHIP-8 interpreter, it is clear from the
 specs that this thing comes with a display, a keypad, and some sort of sound
@@ -222,7 +228,8 @@ the CHIP-8 accordingly.
 
 Let us dive into more details on how to make this happen.
 
-#### Fetch
+---
+{data-content = "Fetch"}
 
 This is the easy part. We just need to grab the two consecutive bytes in memory
 at the address given by the program counter, since an opcode is a 16-bit number
@@ -240,8 +247,8 @@ uint16_t fetch(){
   return opcode;
 }
 ```
-
-#### Decode and Execute
+---
+{data-content = "Decode and Execute"}
 
 We have now gotten hold of the opcode, it is time to decode it. A complete
 list of supported operations and their code can be found [here](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#3.1).
@@ -266,9 +273,45 @@ operation;
 * `y` is a 4-bits integer, always specifying the register to be accessed for the
 operation.
 
-Given the overall simplicity of most of the operations, I have decided to wrap both the decoding and executing phases in a single function, which is basically a big switch case on values of `H`, 
+Given the overall simplicity of most of the operations, I have decided to wrap
+both the decoding and executing phases in a single function, which is basically
+a big switch case on values of `H`. It basically looks like:
 
-At this stage, our `main` function should now look something like this:
+```cpp
+void decode_and_execute(uint16_t opcode){
+
+  // First we define all the nibbles to avoid code duplication
+  uint8_t x = (opcode >> 8) & 0xF;
+  uint8_t y = (opcode >> 4) & 0xF;}
+  uint8_t n = opcode & 0xF;
+  uint8_t kk = opcode & 0xFF;
+  uint16_t nnn = opcode & 0xFFF;
+
+  switch (opcode & 0xF000){
+    case 0x0000:
+      // Execute 0nnn, or 00E0, or 00EE accordingly.
+      break;
+    case 0x1000:
+      // Jump to memory location nnn
+      break;
+    case 0x2000:
+      // Call subroutine at nnn
+      break;
+    .
+    .
+    .
+  }
+```
+
+We will not detail any of the implementations here, but most of the operations
+are fairly simple, with a few notable exceptions (such as `0xDxyn` which draws a
+sprite of size 8 by `n` at coordinates `(x, y)`). We will insist on this in the
+[display section](#the-display), as well as [some pitfalls](#some-pitfalls).
+
+---
+{data-content = "General Structure"}
+
+Now, assuming we , our `main` function should now look something like this:
 
 ```cpp
 int main(int argc, char** argv){
@@ -288,14 +331,112 @@ int main(int argc, char** argv){
   return 0;
 }
 ```
-
 ### The Display
+
+As mentioned before, the display is a `64x32`, monochrome display. There are
+only two instructions which change the state of the display:
+1. `0x00E0`, which clears the display, so we just need to set all the pixels
+to "off";
+1. `0xDxyn`, which draws a sprite of size `8xn` at coordinate `(x,y)` on the
+screen. The sprite is stored in the `n` bytes at `I` in memory.
+
+---
+{data-content = "The 0xDxyn Instruction"}
+
+Let us give some more details about the `0xDxyn` instruction. First of all,
+to remove any and all ambiguity regarding the position of the sprite, the
+coordinate `(x, y)` refers to the top-left corner of the sprite.
+
+Secondly, we read `n` bytes from memory, between offsets `I` and `I + n - 1`.
+Each of these bytes represents a row of 8 pixels in our sprite. These pixels
+then get XORed with the existing display pixel states. One can think of the
+sprite 0s and 1s as, respectively, "don\'t change that pixel's state" and "flip
+that pixel's state"
+
+Finally, we need to consider some possible edge case, namely where the
+sprite goes "off screen" (if `x + 8 >= 64` or `y + n >= 32`). I have found
+contradicting specs regarding that issue, some claiming that the sprite then
+needed to wrap around the display, (so basically doing things mod 64 in the
+x direction and, sometimes but not always, mod 32 in the y direction), and
+some claiming that the sprite should be culled should it go off the screen
+boundaries. A fully-featured emulator should implement all versions with a
+flag and leave the option to the user, as different programs will operate on
+different assumptions with the drawing operation behaviour.
+
+---
+{data-content = "Displaying the Pixel Data"}
+
+In my case, I found it easiest to separate the notion of "display", which
+is just an array of booleans representing the pixel states, and the actual
+rendering in the app window. It makes it extremely simple to refresh the display
+at set intervals (specs dictate 60Hz) by just calling a method which takes these
+pixel states and renders an appropriate image.
+
+That sort of decoupling is also necessary since you do not want to refresh the
+display every time this instruction is called. Indeed, the CHIP-8 display has a
+refresh rate of 60Hz whereas the CHIP-8 typically runs at 700Hz. We will touch a
+bit more on that later.
 
 ### Timers
 
+As written in the [Specifications Overview](#specifications-overview) section,
+the CHIP-8 also has two timers. A general purpose delay timer, which can
+basically act as a timestamp for the CHIP-8, and a sound one, which controls
+when a sound should be played.
+
+Both timers are 8-bits long unsigned integers. They get decremented (if they are
+non zero) at a 60Hz rate. Furthermore, a sound is played if the sound timer is
+greater than zero.
+
 ### Clock Speed
 
+A final word that pertains on the general structure of our main loop, is that
+the CHIP-8 should generally run at 700Hz, and the display be updated at 60Hz,
+which means that one should run several fetch-decode-execute cycles before
+refreshing the screen.
+
+A quick hack I chose to implement for an approximation of that behaviour
+was to grab my display refresh rate through SDL, which is about 60Hz, force
+vertical synchronisation of the display, and run $\left\lfloor\frac{700}
+{\text{refresh rate}}\right\rfloor$ fetch-decode-execute cycles before I update the
+display. Obviously, if one would like to run it on a display with a higher
+refresh rate, then one should implement a timer to ensure we still only render
+at 60 frames per second.
+
+After these considerations, the main function essentially resembles this:
+
+```cpp
+int main(int argc, char** argv) {
+  setup_window();
+  load_rom();
+  load_font();
+
+  bool running = true;
+  uint16_t opcode;
+  uint8_t cyclePerFrame = CLOCK_SPEED / 60;
+  while (running){
+    for (uint8_t i = 0; i < cyclePerFrame; i++) {
+      opcode = fetch();
+      decode_and_execute(opcode);
+    }
+    update_timers();
+    refresh_display(); // should be called at 60Hz, either through timers/ticks or VSync
+    running = check_if_quit();
+  }
+  return 0;
+}
+```
+
 ## Some Pitfalls
+
+In no particular order, here is a list of the silly mistakes I made. These are
+hopefully common enough that they can help you debug strange behaviours of the
+emulator:
+
+1. In some of the relevant instructions, using `x` in lieue of `V[x]`;
+1. In some of the relevant instructions, changing the flag register value `VF`
+before executing main bit of the instruction on the other registers.
+1. In the `0xDxyn` instruction, 
 
 ## Further Improvements
 
