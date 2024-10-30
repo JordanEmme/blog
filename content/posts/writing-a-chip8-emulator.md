@@ -436,8 +436,41 @@ emulator:
 1. In some of the relevant instructions, using `x` in lieue of `V[x]`;
 1. In some of the relevant instructions, changing the flag register value `VF`
 before executing main bit of the instruction on the other registers.
-1. In the `0xDxyn` instruction, 
+1. In the `0xDxyn` instruction, reading the sprite data bits from lowest to
+highest resulting in applying pixel data right-to-left instead of left-to-right,
+thus mirroring sprites.
 
 ## Further Improvements
 
+Some things that I don't want to spend time on, but would be necessary to have a
+more fully-fledged emulator, that is compatible with more programs would be:
+
+1. Having a better solution for the clock speed, and implementing variable
+clock-speed which can be defined by the user (or better yet, changed at
+runtime.);
+1. Some instructions, such as the one coded `0x8xy6` for instance, can have
+different implementations. In some implementations, this sets `Vx` to `Vx &
+1`,and in some others, it sets it to `Vy & 1` (which seems more sensible seeing
+as we have access to `y` from the opcode). Having a flag to switch between
+implementations is necessary;
+1. Similar remark for the behaviour of sprites goin over the screen boundary,
+and choosing whether to wrap around or not;
+1. Allowing the user to chose a display resolution, fullscreen, etc...
+
+And some nice to have that I'd like to give a go at at some point:
+
+1. Having a less boring render of the display (I just render white squares on a
+black background) by adding some scanlines, distorsion, and maybe glare to try
+and emulate an old CRT;
+1. Diving much deeper into clock speed and cycle synchronisation by actually
+taking into account how long instructions are supposed to take and try to
+replicate it faithfully.
+
 ## References
+
+1. The most useful one, that describes all the CHIP-8 specs and instructions is
+ [Cowgod's CHIP-8 Technical Reference](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM);
+1. A great [test suite](https://github.com/Timendus/chip8-test-suite) for the
+CHIP-8 in the repo, so you can check your emulator has a sane behaviour on
+simple tests and narrow issues to some operations;
+1. A [table of instruction's timings](https://jackson-s.me/2019/07/13/Chip-8-Instruction-Scheduling-and-Frequency.html), should you want to do more precise emulation.
