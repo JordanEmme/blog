@@ -1,6 +1,7 @@
 +++
 title = 'Writing a CHIP-8 Emulator'
 date = '2024-10-24T15:34:57+02:00'
+draft = false
 toc = true
 tocBorder = true
 math = true
@@ -58,7 +59,7 @@ The CHIP-8 consists of:
 * An 8-bits delay timer;
 * An 8-bits sound timer;
 * A 60Hz, 64x32, monochrome display;
-* A 16 digits keypad;
+* A 16 digits keypad.
 
 That is all the "hardware" that we have to emulate. This can be done in a very
 straightforward many, as this post will, hopefully, illustrate.
@@ -310,7 +311,8 @@ sprite of size 8 by `n` at coordinates `(x, y)`). We will insist on this in the
 ---
 {data-content = "General Structure"}
 
-Now, assuming we , our `main` function should now look something like this:
+Now, assuming we do the decoding and execution steps in a single function, our
+`main` function should now look something like this:
 
 ```cpp
 int main(int argc, char** argv){
@@ -432,7 +434,7 @@ In no particular order, here is a list of the silly mistakes I made. These are
 hopefully common enough that they can help you debug strange behaviours of the
 emulator:
 
-1. In some of the relevant instructions, using `x` in lieue of `V[x]`;
+1. In some of the relevant instructions, using `x` in lieu of `V[x]`;
 1. In some of the relevant instructions, changing the flag register value `VF`
 before executing main bit of the instruction on the other registers.
 1. In the `0xDxyn` instruction, reading the sprite data bits from lowest to
@@ -452,14 +454,14 @@ different implementations. In some implementations, this sets `Vx` to `Vx &
 1`,and in some others, it sets it to `Vy & 1` (which seems more sensible seeing
 as we have access to `y` from the opcode). Having a flag to switch between
 implementations is necessary;
-1. Similar remark for the behaviour of sprites goin over the screen boundary,
+1. Similar remark for the behaviour of sprites going over the screen boundary,
 and choosing whether to wrap around or not;
 1. Allowing the user to chose a display resolution, fullscreen, etc...
 
 And some nice to have that I'd like to give a go at at some point:
 
 1. Having a less boring render of the display (I just render white squares on a
-black background) by adding some scanlines, distorsion, and maybe glare to try
+black background) by adding some scanlines, distortion, and maybe glare to try
 and emulate an old CRT;
 1. Diving much deeper into clock speed and cycle synchronisation by actually
 taking into account how long instructions are supposed to take and try to
