@@ -9,6 +9,8 @@ math = true
   author = "Jordan Emme"
 +++
 
+![chip](chip8.png)
+
 Where I document how I started learning about emulation and wrote my first toy
 model.
 
