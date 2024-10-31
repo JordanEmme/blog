@@ -1,7 +1,6 @@
 +++
 title = 'Writing a CHIP-8 Emulator'
 date = '2024-10-24T15:34:57+02:00'
-draft = true
 toc = true
 tocBorder = true
 math = true
