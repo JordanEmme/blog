@@ -4,10 +4,9 @@ title = "Jordan Emme's Blog"
 author = "Jordan Emme"
 
 [params]
-description = "Ramblings of a sleep-deprived programmer"
   [params.theme_config]
   appearance = "dark"
-  back_home_text = ".."
+  back_home_text = "home"
   date_format = "2006-01-02"
   isListGroupByDate = false
   show_description = true
