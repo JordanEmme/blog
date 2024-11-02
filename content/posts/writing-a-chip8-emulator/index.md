@@ -62,7 +62,7 @@ The CHIP-8 consists of:
 * A 16 digits keypad.
 
 That is all the "hardware" that we have to emulate. This can be done in a very
-straightforward many, as this post will, hopefully, illustrate.
+straightforward way, as this post will, hopefully, illustrate.
 
 ---
 {data-content = "Font"}
@@ -243,10 +243,17 @@ like this:
 ```cpp
 uint16_t fetch(){
   uint16_t opcode = (memory[pc] << 8) | memory[pc + 1];
-  pc += 2; // we increment the program counter
+  pc += 2;
   return opcode;
 }
 ```
+
+Note that I chose to increment the program counter just after reading the
+current instruction's opcode. This can be done in other places, of course,
+but seeing as some instructions manipulate that program counter, it's
+perhaps best done sometime after fetching rather than an a later stage in the
+fetch-decode-execute cycle.
+
 ---
 {data-content = "Decode and Execute"}
 
@@ -266,7 +273,7 @@ where
 be done;
 * `n` is a 4-bits nibble, either specifying the operation further, or used as an
 operation argument;
-* `kk `is a byte, often used as an operation argument;
+* `kk` is a byte, often used as an operation argument;
 * `nnn` is a 12-bits nibble, which always encodes for a memory address;
 * `x` is a 4-bits integer, always specifying the register to be accessed for the
 operation;
@@ -275,7 +282,7 @@ operation.
 
 Given the overall simplicity of most of the operations, I have decided to wrap
 both the decoding and executing phases in a single function, which is basically
-a big switch case on values of `H`. It basically looks like:
+a big switch case on values of `H`. It looks somewhat like:
 
 ```cpp
 void decode_and_execute(uint16_t opcode){
@@ -301,12 +308,14 @@ void decode_and_execute(uint16_t opcode){
     .
     .
   }
+}
 ```
 
 We will not detail any of the implementations here, but most of the operations
-are fairly simple, with a few notable exceptions (such as `0xDxyn` which draws a
-sprite of size 8 by `n` at coordinates `(x, y)`). We will insist on this in the
-[display section](#the-display), as well as [some pitfalls](#some-pitfalls).
+are fairly simple, with a few notable exceptions (such as `0xDxyn` which draws
+a sprite of size 8 by `n` at coordinates `(V[x], V[y])`). We will insist on this
+in the [display section](#the-display), as well as
+[some pitfalls](#some-pitfalls).
 
 ---
 {data-content = "General Structure"}
@@ -338,15 +347,15 @@ As mentioned before, the display is a `64x32`, monochrome display. There are
 only two instructions which change the state of the display:
 1. `0x00E0`, which clears the display, so we just need to set all the pixels
 to "off";
-1. `0xDxyn`, which draws a sprite of size `8xn` at coordinate `(x,y)` on the
-screen. The sprite is stored in the `n` bytes at `I` in memory.
+1. `0xDxyn`, which draws a sprite of size `8xn` at coordinate `(V[x],V[y])` on
+the screen. The sprite is stored in the `n` bytes at `I` in memory.
 
 ---
 {data-content = "The 0xDxyn Instruction"}
 
 Let us give some more details about the `0xDxyn` instruction. First of all,
 to remove any and all ambiguity regarding the position of the sprite, the
-coordinate `(x, y)` refers to the top-left corner of the sprite.
+coordinate `(V[x], V[y])` refers to the top-left corner of the sprite.
 
 Secondly, we read `n` bytes from memory, between offsets `I` and `I + n - 1`.
 Each of these bytes represents a row of 8 pixels in our sprite. These pixels
@@ -448,7 +457,7 @@ more fully-fledged emulator, that is compatible with more programs would be:
 
 1. Having a better solution for the clock speed, and implementing variable
 clock-speed which can be defined by the user (or better yet, changed at
-runtime.);
+runtime);
 1. Some instructions, such as the one coded `0x8xy6` for instance, can have
 different implementations. In some implementations, this sets `Vx` to `Vx &
 1`,and in some others, it sets it to `Vy & 1` (which seems more sensible seeing
