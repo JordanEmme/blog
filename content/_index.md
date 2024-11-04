@@ -16,5 +16,5 @@ tool.
 Before that, I was a mathematician, and studied stuff related to symbolic
 dynamics and thermodynamic formalism.
 
-This is a place for me to ramble about professional and personal projects, hope you enjoy
-your stay!
+This is a place for me to ramble about professional and personal projects, hope
+you enjoy your stay!

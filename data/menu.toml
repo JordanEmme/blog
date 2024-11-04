@@ -6,3 +6,12 @@ title = "Posts"
   show_more = true
   show_more_text = "See archive..."
   show_more_url = "posts"
+
+[[entries]]
+title = "About Me"
+  [[entries.entries]]
+  title = "<a href=\"https://github.com/JordanEmme\">Github</a>"
+  [[entries.entries]]
+  title = "<a href=\"https://www.linkedin.com/in/jordanemme/\">LinkedIn</a>"
+  [[entries.entries]]
+  title = "<a href=\"mailto:jordanemme@protonmail.com\">Contact me</a>"

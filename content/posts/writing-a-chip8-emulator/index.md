@@ -10,7 +10,7 @@ math = true
 +++
 
 Where I document how I started learning about emulation and wrote my first toy
-model.
+model. [Github link to the project](https://github.com/JordanEmme/chippy8).
 
 ## Why?
 
