@@ -10,7 +10,7 @@ I am a software engineer, passionate about all things at the intersection of pro
 science, and mathematics.
 
 These days, I am doing research in graphics for Imagination Technologies (better known under its
-previous moniker "VideoLogic" by the ~older~ more experienced gamers and game developpers).
+previous moniker "VideoLogic" by the ~older~ more experienced gamers and game developers).
 
 I have previously worked at Gravity Sketch, where I contributed to building the geometry kernel of
 the eponymous application, a collaborative, VR, 3D modeling tool.
