@@ -44,8 +44,8 @@ that particular era that is).
 To the best of my understanding, the factor which most contributes to the texture wobble effect in
 PlayStation 1 games is the way the texture coordinates are being computed. If you know the basics of
 how to rasterise a triangle, and what UV/texture coordinates are in the context of 3D meshes, feel
-free to jump to subsection [Affine Interpolation](#affine-interpolation).
-
+free to jump to subsection about
+[the PlayStation texture coordinates computation](#the-playstation-texture-coordinates-computation)
 ### Basics of Triangle Rasterisation
 
 First a little refresher (or crash-course) on how 3D is being renderer on screen through
@@ -79,8 +79,9 @@ Of course, our displays are not 3D, but 2D, so we have to project these onto a 2
 keep things simple and not worry too much about the actual "physical" properties of our display
 (resolution, curvature if you have a CRT or a Gamerz™ ultrawide) for now, and consider a plane in
 the 3D space which will represent the display. We'll call it the screen. There are three main steps:
-1. Project the triangle to the screen. 2. Compute a bounding box for the projected 2D triangle. 3.
-Determine which pixels (with the appropriate discretisation of the plane) in the bounding box are
+1. Project the triangle to the screen.
+1. Compute a bounding box for the projected 2D triangle.
+1. Determine which pixels (with the appropriate discretisation of the plane) in the bounding box are
 inside the projected triangle: these are the ones to be drawn.
 
 ---
@@ -248,11 +249,11 @@ is the depth associated to that pixel, and we can compare it against what is sto
 to decide whether this is in front or behind what has already been drawn, and then render and update
 the Z-buffer accordingly.
 
-We will touch a bit more on how to compute that depth properly in later sections, but as a side note,
-it seems the PlayStation hardware did not have a dedicated Z-buffer (which seems somewhat staggering
-to me for a 3D-first console, but I don't know the ins and outs of that decision and which tradeoffs
-the engineers had to make then). As a consequence, PlayStation game developers had to implement a
-Z-buffer in software for their 3D games...
+We will touch a bit more on how to compute that depth properly in later sections, but as a side
+note, it seems the PlayStation hardware did not have a dedicated Z-buffer (which seems somewhat
+staggering to me for a 3D-first console, but I don't know the ins and outs of that decision and
+which tradeoffs the engineers had to make then). As a consequence, PlayStation game developers had
+to implement a Z-buffer in software for their 3D games...
 
 ---
 {data-content="Summary"}
@@ -324,10 +325,10 @@ points of the 2D plane \\(\mathbb{R}^2\\) which cover the image onto the 3D surf
 general terms, we which to get a function:
 
 \\[
-\varphi: \mathcal{D} \subset \mathbb{R}^2 \mapsto S
+\varphi: \mathscr{D} \subset \mathbb{R}^2 \mapsto \mathscr{S}
 \\]
 
-where \\(\mathcal{D}\\) is a *nice* (in general that means a finite union of bounded domains for
+where \\(\mathscr{D}\\) is a *nice* (in general that means a finite union of bounded domains for
 our purposes) subset of the euclidean plane. The parametrisation function \\(\varphi\\) should
 additionally have good properties (often, being as close to being conformal or isometric as
 possible). Additionally, this function should be surjective (*i.e.* every point of the co-domain
@@ -343,18 +344,23 @@ polygons (and let's just reduce that to triangles specifically). We can thus do 
 backwards, in the following sense:
 
 Seeing as triangles are "flat" (*i.e.* they are always planar), we can (and should) restrict
-ourselves to parametrisations which map triangles in 2D space (texture space) to the triangles of
-our mesh/surface linearly.
+ourselves to piecewise-affine parametrisations on these triangles, so as to preserve the barycentric
+coordinates. Formally, we want parametrisations such that, for any 2D triangle \\(abc\\), and any
+point \\(p\\) with barycentric coordinates \\(\left( \lambda_a, \lambda_b, \lambda_c \right)\\),
+the parametrisation \\(\varphi\\) satisfies
+\\[
+\varphi(p) = \lambda_a \varphi(a) + \lambda_b \varphi(b) + \lambda_c \varphi(c).
+\\]
+In this context, the texture coordinates of vertices in 3D space are the pre-images of these
+vertices by the parametrisation \\(\varphi\\). It is thus easy to compute the pre-image of any point
+in the 3D triangle, should we know its barycentric coordinates, by just computing
+\\[
+\lambda_A \varphi^{-1}(A) + \lambda_B \varphi^{-1}(B) + \lambda_C \varphi^{-1}(C).
+\\]
 
-> For any triangle \\(ABC\\) in \\(S\\) and any \\(P\\) in \\(ABC\\), let \\(a\\), \\(b\\), and
-\\(c\\) be the respective pre-images of \\(A\\), \\(B\\), and \\(C\\) under the parametrisation
-\\(\varphi\\)
+## The PlayStation Texture Coordinates Computation
 
 ### Affine Interpolation
-
-## What's Wrong with Affine Texture Interpolation?
-
-### An Example
 
 ### The Correct Interpolation
 
