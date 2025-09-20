@@ -416,7 +416,50 @@ Start with the 3D triange \\(ABC\\) which is both non-degenerate and lies in the
 \left\\{(x, y, z), \\, (x,y) \in \mathbb{R}^2 \text{ and } z > 0\right\\}.
 \\]
 
-Let 
+Let \\(P\\) be a point in the triangle \\(ABC\\) with barycentric coordinates \\(\left(m_A, m_B,
+m_C \right)\\) be the barycentric coordinates. Let \\(\overline{A}\overline{B}\overline{C}\\) be the
+projected triangle on the screen and \\(\overline{P}\\) be the projection of \\(P\\) onto that same
+screen. Denote \\(\left(m_{\overline{A}}m_{\overline{B}}m_{\overline{C}}\right)\\) the barycentric
+coordinates of \\(\overline{P}\\) in \\(\overline{A}\overline{B}\overline{C}\\).
+
+Let us first write:
+
+\\[
+m_A A + m_B B + m_C C = P
+\\]
+
+which is implies that
+
+\\[
+\left\\{\begin{aligned}
+& z_A m_A \overline{A} + z_B m_B \overline{B} +z_C m_C \overline{C} = P \\\
+& \text{and} \\\
+& z_A m_A + z_B m_B + z_C m_C = z_P
+\end{aligned}\right.
+\\]
+
+which, in turn, implies that
+
+\\[
+\left\\{\begin{aligned}
+& \frac{z_A m_A}{z_P} \overline{A} + \frac{z_B m_B}{z_P} \overline{B} + \frac{z_C m_C}{z_P}
+\overline{C} = \overline{P} \\\
+& \text{and} \\\
+& \frac{z_A m_A}{z_P} + \frac{z_B m_B}{z_P} + \frac{z_C m_C}{z_P} = 1
+\end{aligned}\right.
+\\]
+
+hence
+\\[
+\overline{m_A} = \frac{z_A m_A}{z_P} ,\\,
+\overline{m_B} = \frac{z_B m_B}{z_P} ,\\,
+\overline{m_C} = \frac{z_C m_C}{z_P}.
+\\]
+
+From here on, it is clear that if we wish to interpolate the texture coordinates of point
+\\(\overline{P}\\), we need to compute the depth \\(z_P\\) so as to infer the barycentric
+coordinates of point \\(P\\) in 3D space. 
+
 
 ## Conclusion
 
