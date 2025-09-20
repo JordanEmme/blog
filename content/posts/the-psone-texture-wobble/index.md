@@ -10,7 +10,7 @@ math = true
 +++
 
 Where I ramble on about the PlayStation texture affine interpolation and a few bits on
-how to render a triangle in software. [Some terrible code hacked together for illustration
+how to render a triangle in software. [Some hacky code cobbled together for illustration
 purposes](https://github.com/JordanEmme/s0-wren/).
 
 ## What's this about?
@@ -27,9 +27,9 @@ which somewhat emulates this behaviour on a rotating cube. Here is the pixelated
   preload="auto"
 >}}
 
-Notice in particular the jarring distortions along a diagonal of each square face of this cube
-(this happens to be the diagonal along which each square is partitioned into two triangles). Now I
-am not pretending in any way that what I hacked is a faithful representation of how the PlayStation
+Notice in particular the jarring distortions along a diagonal of each square face of this cube (this
+happens to be the diagonal along which each square is partitioned into two triangles). Now, I am
+not pretending that what I hacked together is a faithful representation of how the PlayStation
 does all its rendering in any way, shape, or form. That being said, the fundamental reason why my
 renderer exhibits this warp/wobble of the texture during the cube rotation is the same as why this
 phenomenon appeared on the console.
@@ -45,7 +45,10 @@ To the best of my understanding, the factor which most contributes to the textur
 PlayStation 1 games is the way the texture coordinates are being computed. If you know the basics of
 how to rasterise a triangle, and what UV/texture coordinates are in the context of 3D meshes, feel
 free to jump to subsection about
-[the PlayStation texture coordinates computation](#the-playstation-texture-coordinates-computation)
+[the PlayStation texture coordinates computation.](#the-playstation-texture-coordinates-computation)
+Otherwise, please read on as I try to make a simple, self-contained, summary of what is needed to
+understand the issue.
+
 ### Basics of Triangle Rasterisation
 
 First a little refresher (or crash-course) on how 3D is being renderer on screen through
@@ -57,8 +60,8 @@ matter](https://github.com/ssloy/tinyrenderer).
 
 What is rasterisation in our context? Put simply, it is the act of representing a triangle (or any
 geometrical object really) in 3D space as a bunch of pixels on a 2D display. Let us precise the
-concepts with some C code (with no regard for performance: I rather tries to organise data in a
-didactic way).
+concepts with some C code (with no regard for performance: I rather try to organise code and data
+in a didactic way).
 
 ```c
 typedef struct vec3 {
@@ -90,14 +93,14 @@ inside the projected triangle: these are the ones to be drawn.
 There are many ways to project the three-dimensional space \\(\mathbb{R}^3\\) to the two-dimensional
 space \\(\mathbb{R}^2\\). Of these, the two most notable ones in the domain of computer graphics
 are the orthogonal projection and the perspective projection. The careful reader will have noted
-that I am implying unicity of these projections through the use of the definite article: this is
+that I am implying uniqueness of these projections through the use of the definite article: this is
 because it is traditional to fix the screen to be the plane with normal \\(\vec{e_z} = (0,0,1)\\)
 and containing the point \\(O = (0,0,\pm 1)\\) as expressed in the observer's/camera's coordinate
-system. In other words, the camera's is looking in the direction of the vector \\(\pm \vec{e_z}\\)
-and therefore, \\(z\\) (or \\(-z\\) reresents the depth).
+system. In other words, the camera is looking in the direction of the vector \\(\pm \vec{e_z}\\)
+and therefore, \\(z\\) (or sometimes \\(-z\\)) represents the depth.
 
 > __Remark__: The orientation is dependent on some choice of coordinate systems as there is not
-a single convention in the world of 3D modeling and computer graphics. Some software assume a
+a single convention in the world of 3D modelling and computer graphics. Some software assume a
 direct (also called right-hand) orientation --- which would be my preference, given this is the most
 natural way to do things, mathematically speaking --- and some assume a left-hand orientation. For
 the camera orientation, I tend to prefer having \\(x\\) pointing right,  \\(y\\) pointing down, and
@@ -162,7 +165,7 @@ typedef struct BBox {
 } BBox;
 ```
 
-Essentially one needs to map the triangle vertices on the screen to points on the display (i.e.
+Essentially, one needs to map the triangle vertices on the screen to points on the display (i.e.
 apply the right scaling --- which depends on the resolution --- and translation to move the origin
 from the centre of the screen to the top-left of the display: the display is a 2D array of pixels so
 it helps to set the origin in the usual way). 
@@ -202,26 +205,28 @@ an easy check whether the point is inside or outside the triangle. So now the qu
 compute the barycentric coordinates. I won't derive the computations here, but one possible, and
 elegant, formulation is the following:
 
-\\[
-\begin{aligned}
-m_A &= \frac{\text{SignedArea}(PBC)}{\text{SignedArea}(ABC)}, \\\
-m_B &= \frac{\text{SignedArea}(APC)}{\text{SignedArea}(ABC)}, \\\
-m_C &= \frac{\text{SignedArea}(ABP)}{\text{SignedArea}(ABC)}. 
-\end{aligned}
-\\]
+> ##### Barycentric Coordinates Formula
+> \\[
+> \begin{aligned}
+> m_A &= \frac{\text{SignedArea}(PBC)}{\text{SignedArea}(ABC)}, \\\
+> m_B &= \frac{\text{SignedArea}(APC)}{\text{SignedArea}(ABC)}, \\\
+> m_C &= \frac{\text{SignedArea}(ABP)}{\text{SignedArea}(ABC)}. 
+> \end{aligned}
+> \\]
 
 Furthermore, the [signed area](https://en.wikipedia.org/wiki/Signed_area) of a triangle \\(ABC\\)
 can easily be computed as the determinant of a \\(3\times 3\\) matrix as follows:
 
-\\[
-\text{SignedArea}(ABC) = \frac12 \left|
-\begin{array}{ccc}
-x_A & y_A & 1 \\\
-x_B & y_B & 1 \\\
-x_C & y_C & 1 
-\end{array}
-\right|.
-\\]
+> ##### Signed Area Formula
+> \\[
+> \text{SignedArea}(ABC) = \frac12 \left|
+> \begin{array}{ccc}
+> x_A & y_A & 1 \\\
+> x_B & y_B & 1 \\\
+> x_C & y_C & 1 
+> \end{array}
+> \right|.
+> \\]
 
 > __Remark__: Seeing as we are only interested in the signs of the barycentric coordinates, it is
 not technically necessary to compute them at that stage. However, seeing the important role that
@@ -252,7 +257,7 @@ the Z-buffer accordingly.
 We will touch a bit more on how to compute that depth properly in later sections, but as a side
 note, it seems the PlayStation hardware did not have a dedicated Z-buffer (which seems somewhat
 staggering to me for a 3D-first console, but I don't know the ins and outs of that decision and
-which tradeoffs the engineers had to make then). As a consequence, PlayStation game developers had
+which trade-offs the engineers had to make then). As a consequence, PlayStation game developers had
 to implement a Z-buffer in software for their 3D games...
 
 ---
@@ -308,7 +313,7 @@ Let us dig a bit more into what should happen in that `shade` function in the ne
 
 ### How Texturing Works
 
-All this is well and good, and with what we have so far we can determine which pixel needs shading
+This is all well and good, and with what we have so far we can determine which pixel needs shading
 (and which triangle this is from), but this say nothing of which colour to chose for said pixel.
 
 There are a bunch of factors that come into play here (where the light sources are, which type they
@@ -335,7 +340,7 @@ possible). Additionally, this function should be surjective (*i.e.* every point 
 \\(S\\) can be reached as a image of the function).
 
 These parametrisation can take many forms, and, even in the context of computer
-graphics and modeling,  one could have surfaces which are entirely defined
+graphics and modelling,  one could have surfaces which are entirely defined
 via such objects with polynomial or rational functions (see, for instance
 [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline)).
 
@@ -345,24 +350,73 @@ backwards, in the following sense:
 
 Seeing as triangles are "flat" (*i.e.* they are always planar), we can (and should) restrict
 ourselves to piecewise-affine parametrisations on these triangles, so as to preserve the barycentric
-coordinates. Formally, we want parametrisations such that, for any 2D triangle \\(abc\\), and any
-point \\(p\\) with barycentric coordinates \\(\left( \lambda_a, \lambda_b, \lambda_c \right)\\),
-the parametrisation \\(\varphi\\) satisfies
+coordinates. Formally, we want parametrisations such that, for any 2D triangle \\(abc\\) in the
+domain \\(\mathscr{D}\\), and any point \\(p\\) with barycentric coordinates \\(\left( m_a,
+m_b, m_c \right)\\), the parametrisation \\(\varphi\\) satisfies
 \\[
-\varphi(p) = \lambda_a \varphi(a) + \lambda_b \varphi(b) + \lambda_c \varphi(c).
+\varphi(p) = m_a \varphi(a) + m_b \varphi(b) + m_c \varphi(c).
 \\]
 In this context, the texture coordinates of vertices in 3D space are the pre-images of these
 vertices by the parametrisation \\(\varphi\\). It is thus easy to compute the pre-image of any point
 in the 3D triangle, should we know its barycentric coordinates, by just computing
 \\[
-\lambda_A \varphi^{-1}(A) + \lambda_B \varphi^{-1}(B) + \lambda_C \varphi^{-1}(C).
+m_A \varphi^{-1}(A) + m_B \varphi^{-1}(B) + m_C \varphi^{-1}(C).
 \\]
+
+Long story short, to get the texture coordinate of any point in a 3D triangle, it is enough to know
+the texture coordinates of the vertices, and we can just interpolate them by expressing the point in
+the triangle with barycentric coordinates relative to the triangle vertices.
 
 ## The PlayStation Texture Coordinates Computation
 
+As it turns out, the Playstation was computing texture coordinates incorrectly (or rather, made an
+approximation which did not turn out to be so good), by using affine interpolation, directly from
+the screen space. Let us detail what this looks like and why it is yields wrong results.
+
 ### Affine Interpolation
 
+Let \\(ABC\\) be a non-degenerate triangle in 3D space and let us denote its projection
+to the 2D screen space as \\(\overline{A}\overline{B}\overline{C}\\). Then, for a pixel
+with 2D screen coordinates \\(\overline{P}\\), we compute the barycentric coordinates
+\\(\left(m_{\overline{A}}, m_{\overline{B}}, m_{\overline{C}}\right)\\) with the [aforementioned
+formula](#barycentric-coordinates-formula).
+Let us denote \\(a\\), \\(b\\), and \\(c\\) the respective texture coordinates of \\(A\\), \\(B\\),
+and \\(C\\). We compute the affine interpolation of these texture coordinates with the barycentric
+coordinates \\(\left(m_{\overline{A}}, m_{\overline{B}}, m_{\overline{C}}\right)\\), meaning we
+compute the texture coordinate \\(p\\):
+
+\\[
+p =  m_{\overline{A}} a + m_{\overline{B}} b + m_{\overline{C}} c.
+\\]
+
+So what is the issue here? The issue is that we compute the interpolation of the texture coordinates
+using the barycentric coordinates in __*2D screen space*__ and not __*3D world space*__. This
+matters a great deal in our case, since we used a perspective projection to go from 3D to 2D
+space and as such, the barycentric coordinates in 2D not only have no reason to be the same as
+the 3D space one, but additionally, the texture coordinates do not change linearly *w.r.t* vertex
+coordinates \\(x\\), \\(y\\), and \\(z\\) but rather \\(x\\), \\(y\\), and \\(w = \frac{1}{z}\\) in
+that projected space.
+
+The following sketch should help illustrate the issue, from 2D to 1D space:
+
+![Affine Projection in 2D](affine-projection-2d.png)
+
+From this sketch, it is hopefully obvious that \\(\overline{P}\\) is the middle of
+\\(\left[\overline{A}, \overline{B}\right]\\), or, in other words, its barycentric coordinates are
+\\(\left(\frac12, \frac12\right)\\), but its pre-image \\(P\\) under the perspective projection is
+not the middle of \\(\left[A, B\right]\\). So how do we fix this?
+
 ### The Correct Interpolation
+
+As mentioned, in the previous subsection, the crux of the error is to assume that the barycentric
+coordinates in 3D and 2D space coïncide. Let us show how they are actually linked, and what that
+means for the texture coordinate computation with as elementary a computation as possible.
+Start with the 3D triange \\(ABC\\) which is both non-degenerate and lies in the positive half-space
+\\[
+\left\\{(x, y, z), \\, (x,y) \in \mathbb{R}^2 \text{ and } z > 0\right\\}.
+\\]
+
+Let 
 
 ## Conclusion
 
