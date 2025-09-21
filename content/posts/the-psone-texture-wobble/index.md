@@ -1,7 +1,7 @@
 +++
 title = 'The PlayStation Texture Wobble'
-date = '2025-08-02'
-draft = true
+date = '2025-09-21'
+draft = false
 toc = true
 tocBorder = true
 math = true
@@ -409,9 +409,9 @@ not the middle of \\(\left[A, B\right]\\). So how do we fix this?
 ### The Correct Interpolation
 
 As mentioned, in the previous subsection, the crux of the error is to assume that the barycentric
-coordinates in 3D and 2D space coïncide. Let us show how they are actually linked, and what that
+coordinates in 3D and 2D space coincide. Let us show how they are actually linked, and what that
 means for the texture coordinate computation with as elementary a computation as possible.
-Start with the 3D triange \\(ABC\\) which is both non-degenerate and lies in the positive half-space
+Start with the 3D triangle \\(ABC\\) which is both non-degenerate and lies in the positive half-space
 \\[
 \left\\{(x, y, z), \\, (x,y) \in \mathbb{R}^2 \text{ and } z > 0\right\\}.
 \\]
@@ -428,7 +428,7 @@ Let us first write:
 m_A A + m_B B + m_C C = P
 \\]
 
-which is implies that
+which implies that
 
 \\[
 \left\\{\begin{aligned}
@@ -451,15 +451,81 @@ which, in turn, implies that
 
 hence
 \\[
-\overline{m_A} = \frac{z_A m_A}{z_P} ,\\,
-\overline{m_B} = \frac{z_B m_B}{z_P} ,\\,
-\overline{m_C} = \frac{z_C m_C}{z_P}.
+{m_{\overline{A}}} = \frac{z_A m_A}{z_P} ,\\,
+{m_{\overline{B}}} = \frac{z_B m_B}{z_P} ,\\,
+{m_{\overline{C}}} = \frac{z_C m_C}{z_P}.
 \\]
 
 From here on, it is clear that if we wish to interpolate the texture coordinates of point
 \\(\overline{P}\\), we need to compute the depth \\(z_P\\) so as to infer the barycentric
-coordinates of point \\(P\\) in 3D space. 
+coordinates of point \\(P\\) in 3D space. Its inverse is easily computed as
+\\[
+\frac{1}{z_P} = \frac{m_{\overline{A}}}{z_A} + \frac{m_{\overline{B}}}{z_B} +
+\frac{m_{\overline{C}}}{z_C}.
+\\]
 
+This is a trivial consequence of
+\\[
+m_A + m_B + m_C = 1
+\\]
+and the previous identities between the barycentric coordinates in 2D screen space and 3D world
+space.
+
+In summary, the computation of the texture coordinates for a given pixel in a given triangle should
+look somewhat like this:
+
+```c
+typedef struct vec2 {
+  float u;
+  float v;
+} vec2;
+
+typedef struct tri3D {
+  vec3 pos[3];
+  vec2 tex[3]; // extend struct with texture coordinates
+} tri3D;
+
+vec2 get_tex_coords(int pixRow, int pixCol, tri3D pTri) {
+  // maps display to screen coordinates
+  vec3 pScrCoords = screen_coords(pixRow, pixCol) 
+
+  // Compute barycentric coordinates of pixel in screen space
+  float sAreaInv = 1.f / s_area2D(pTri.pos[0], pTri.pos[1], pTri.pos[2]);
+
+  float m0 = sAreaInv * s_area2D(pScrCoords, pTri.pos[1], pTri.pos[2])
+  float m1 = sAreaInv * s_area2D(pTri.pos[0], pScrCoords, pTri.pos[2])
+  float m2 = sAreaInv * s_area2D(pTri.pos[0], pTri.pos[1], pScrCoords)
+
+  // Divide by the depth of the vertices (which we precomputed and stored on the
+  // z component)
+  m0 *= pTri.pos[0].z; 
+  m1 *= pTri.pos[1].z; 
+  m2 *= pTri.pos[2].z; 
+
+  // Compute the depth of the pixel in 3D space
+  float z = 1.f / (m0 + m1 + m2);
+
+  // And now compute the components of each texture coordinates
+  float u = z * (m0 * pTri.tex[0].u + m1 * pTri.tex[1].u + m2 * pTri.tex[2].u);
+  float v = z * (m0 * pTri.tex[0].v + m1 * pTri.tex[1].v + m2 * pTri.tex[2].v);
+  
+  return (vec2) {u, v};
+}
+```
 
 ## Conclusion
 
+So now you should have an idea of what went wrong with texturing on the Playstation 1 and what is
+(partially) responsible for the janky wobble of the surrounding world and objects as the camera
+pans through.
+
+Hopefully this can come of use to anyone who wishes to do a project such as a game or animations
+which emulate that look. One can write a software renderer from scratch with that in mind or
+use some shader trickery to obtain a similar effect with hardware acceleration (through reverting
+the perspective projection by multiplying by the weights essentially).
+
+Ultimately, I don't know much about the development history of the Playstation, but I do find
+it somewhat strange that a console which was heavily marketed (and used) as being mostly for 3D,
+would be equipped with hardware lacking such capabilities (not to mention the lack of a z-buffer
+and floating points!). I would love to know more about the reasons that led to having to make such
+sacrifices (so if anyone knows, feel free to contact me about it).
