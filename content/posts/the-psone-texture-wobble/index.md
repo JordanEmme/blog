@@ -285,7 +285,7 @@ for (size_t i = 0; i < numTriangles; ++i) {
   }
 
   for (int row = box.minRow; row <= box.maxRow, ++row) {
-    for (int col = box.minCol; row <= box.maxCol, ++row) {
+    for (int col = box.minCol; col <= box.maxCol, ++col) {
       if (pixel_is_in_tri(row, col, projTri)) {
         float depth = get_z(row, col, projTri);
         if (depth < zBuff[row * NUM_COL + col]) {
@@ -371,7 +371,7 @@ the triangle with barycentric coordinates relative to the triangle vertices.
 
 As it turns out, the Playstation was computing texture coordinates incorrectly (or rather, made an
 approximation which did not turn out to be so good), by using affine interpolation, directly from
-the screen space. Let us detail what this looks like and why it is yields wrong results.
+the screen space. Let us detail what this looks like and why this yields wrong results.
 
 ### Affine Interpolation
 
