@@ -18,8 +18,8 @@ purposes](https://github.com/JordanEmme/s0-wren/).
 I just wanted to write a blog post about something funny I have learned relatively recently. If you
 have played any PlayStation 1 games, you'll know that the graphics --- the textures in particular
 --- seem to always contort and distort in strange ways as the viewing angles of the objects change.
-For illustrative purposes, I slapped together a tiny software renderer I wrote which somewhat
-emulates this behaviour on a rotating cube. Here is the pixelated output:
+For illustrative purposes, I quickly slapped together a tiny software renderer I wrote which
+somewhat emulates this behaviour on a rotating cube. Here is the pixelated output:
 
 {{< video
   src="psone-cube.mp4"
@@ -81,7 +81,6 @@ three main steps:
 1. Project the triangle to the screen.
 1. Compute a *bounding box* for the projected 2D triangle.
 1. Determine which pixels in the bounding box are inside the projected triangle and shade them. 
-
 
 ---
 {data-content=Projection}
