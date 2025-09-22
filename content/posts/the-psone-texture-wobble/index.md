@@ -511,3 +511,5 @@ for sub-pixel precision, which explains the *jitter* of Playstation games too. I
 wonder whether the lack of precision would have made a perspective correct interpolation not doable
 or not look better enough to justify the computational cost. 
 
+Now, I'll go play Crash Bandicoot again, admire the jitter and wobble, and get sad once more at the
+realisation that my reflexes really are not what they used to be.
