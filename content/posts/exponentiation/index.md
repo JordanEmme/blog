@@ -1,7 +1,7 @@
 +++
 title = 'Fast Exponentiation and Floating Point Representations'
 date = '2026-02-13'
-draft = true
+draft = false
 toc = true
 tocBorder = true
 math = true
