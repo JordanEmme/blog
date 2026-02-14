@@ -97,7 +97,7 @@ used in the fast inverse square root algorithm, by defining the following union:
 ```c
 typedef union F32 {
     float value;
-    uint32_t bits;
+    int32_t bits;
 } F32;
 ```
 
@@ -108,7 +108,7 @@ With that, we can now also write a seemingly undecipherable algorithm to approxi
 ```c
 float fast_exp(float f) {
     float fb = f * 12102203;
-    F32 expo = {.bits = (int)fb + 1064986823};
+    F32 expo = {.bits = (int)fb + 1065307417};
     return expo.value;
 }
 ```
@@ -119,25 +119,26 @@ There are only three lines, and essentially three things to explain in that piec
 
 1. What is the constant \\(12102203\\)?
 1. What does the cast to `int`, then the reinterpretation of the bits to a floating point achieve?
-1. What is the constant \\(1064986823\\)?
+1. What is the constant \\(1065307417\\)?
 
 #### The Constant 12102203
 
 Why 12102203? Well, it turns out this is the value of \\(\text{log}_2(e) \times 2^{23}\\). Notice
 this is an integer because we have 23 bits of precision with 32bits floating points.
 
-#### The Constant 1064986823
+#### The Constant 1065307417
 
 This one is more tricky. "Half" of it is straightforward, and the other one is an optimisation.
-The constant 1064986823 can be written as:
+The constant 1065307417 can be written as:
 \\[
-1064986823 = (127 \ll 23) - 366393.
+1065307417 = (127 \ll 23) - 45779.
 \\]
 
 Here, 127 is the bias of 32-bit floating points, it is shifted left 23 times (or multiplied by
-\\(2^{23}\\)), and 366393 is an optimisation constant computed to minimise the maximum relative
+\\(2^{23}\\)), and 45779 is an optimisation constant computed to minimise the maximum relative
 error between our approximation of exponential and the hardware returned value of the exponential
-function.
+function. A mathematical derivation of the optimisation constant is presented in Schraudolph's
+paper. Perhaps sadly, these days, you can just brute-force one.
 
 #### Cast and Bit/Reinterpret Cast
 
@@ -202,3 +203,10 @@ If you were to check the relative error on the entire 32-bit floating points ran
 attention about possible edge cases with 0 and INF/NaN), you'll find it to be bounded by around
 3%. This is not bad for what little work our function does but can be improved with further
 adjustments... at the cost of performance of course.
+
+Now, as always with these kinds of old hacks, we must remember that hardware (and compilers) have
+come a long way, and it can be hard to predict whether or not these are more efficient than the
+current floating point operations and compiler optimisations, and in which circumstances. Some
+of them may be better suited to modern hardware (maybe easier to do SIMD optimisation on them for
+instance, or in unoptimised shader code) than others. One shouldn't implement them blindly (and
+nostalgically), but rather understand, profile, and validate.
