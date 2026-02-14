@@ -189,7 +189,7 @@ We should recognise here (part of) the constants which were necessary to readjus
 exponentiation induced by the bit-cast of an integer to a floating point.
 
 This kind of computation can be extended to understand what happens between the
-\\(2^i\\) and \\(2^{i + i}\\) images --- spoilers: it's a piecewise affine function
+\\(2^i\\) and \\(2^{i + 1}\\) images --- spoilers: it's a piecewise affine function
 --- as well as doing a rigorous analysis of the errors. This is done in the [original
 paper](https://nic.schraudolph.org/pubs/Schraudolph99.pdf) I mentioned at the very start.
 
